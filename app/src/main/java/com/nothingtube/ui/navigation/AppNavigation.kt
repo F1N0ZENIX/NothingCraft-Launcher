@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.*
 import com.nothingtube.NothingTubeApp
 import com.nothingtube.data.model.VideoItem
+import com.nothingtube.settings.SettingsManager
 import com.nothingtube.ui.components.NothingBottomBar
 import com.nothingtube.ui.favorites.FavoritesScreen
 import com.nothingtube.ui.history.HistoryScreen
@@ -26,22 +27,14 @@ fun AppNavigation() {
     val repository = app.repository
     val scope = rememberCoroutineScope()
 
-    var apiKey by remember { mutableStateOf("") }
+    LaunchedEffect(Unit) { SettingsManager.load(context) }
+
     var favorites by remember { mutableStateOf<List<com.nothingtube.data.local.VideoEntity>>(emptyList()) }
     var history by remember { mutableStateOf<List<com.nothingtube.data.local.VideoEntity>>(emptyList()) }
     var currentVideo by remember { mutableStateOf<VideoItem?>(null) }
 
-    LaunchedEffect(Unit) {
-        val prefs = context.getSharedPreferences("nothing_tube", 0)
-        apiKey = prefs.getString("api_key", "") ?: ""
-    }
-
-    LaunchedEffect(Unit) {
-        scope.launch { repository.favorites().collect { favorites = it } }
-    }
-    LaunchedEffect(Unit) {
-        scope.launch { repository.history().collect { history = it } }
-    }
+    LaunchedEffect(Unit) { scope.launch { repository.favorites().collect { favorites = it } } }
+    LaunchedEffect(Unit) { scope.launch { repository.history().collect { history = it } } }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -59,13 +52,14 @@ fun AppNavigation() {
                 }
                 composable("search") {
                     SearchScreen(
-                        apiKey = apiKey,
-                        onSearch = { q, music -> repository.search(q, apiKey, music) },
+                        apiKey = SettingsManager.apiKey,
+                        onSearch = { q, music -> repository.search(q, SettingsManager.apiKey, music) },
                         onOpenVideo = { item ->
                             scope.launch { repository.markOpened(item) }
                             currentVideo = item
                             navController.navigate("player")
-                        }
+                        },
+                        musicMode = SettingsManager.musicDefault
                     )
                 }
                 composable("player") {
@@ -103,16 +97,20 @@ fun AppNavigation() {
                     )
                 }
                 composable("music") {
-                    MusicScreen(apiKey = apiKey, onOpenSearch = { navController.navigate("search") })
+                    MusicScreen(apiKey = SettingsManager.apiKey, onOpenSearch = { navController.navigate("search") })
                 }
                 composable("settings") {
                     SettingsScreen(
-                        apiKey = apiKey,
-                        onApiKeyChange = { key ->
-                            apiKey = key
-                            context.getSharedPreferences("nothing_tube", 0).edit()
-                                .putString("api_key", key).apply()
-                        }
+                        apiKey = SettingsManager.apiKey,
+                        accentColor = SettingsManager.accentColor,
+                        showDots = SettingsManager.showDots,
+                        compactMode = SettingsManager.compactMode,
+                        musicDefault = SettingsManager.musicDefault,
+                        onApiKeyChange = { SettingsManager.saveApiKey(context, it) },
+                        onAccentChange = { SettingsManager.setAccent(context, it) },
+                        onShowDotsChange = { SettingsManager.setShowDots(context, it) },
+                        onCompactModeChange = { SettingsManager.setCompactMode(context, it) },
+                        onMusicDefaultChange = { SettingsManager.setMusicDefault(context, it) }
                     )
                 }
             }

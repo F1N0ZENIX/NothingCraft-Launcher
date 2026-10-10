@@ -2,14 +2,12 @@ package com.nothingtube.ui.home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.nothingtube.settings.SettingsManager
 import com.nothingtube.ui.components.NothingDotMatrix
-import com.nothingtube.ui.components.NothingVideoCard
 import com.nothingtube.ui.theme.*
 
 @Composable
@@ -20,6 +18,7 @@ fun HomeScreen(
     onOpenHistory: () -> Unit
 ) {
     var query by remember { mutableStateOf("") }
+    val accent = accentColorFor(SettingsManager.accentColor)
 
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp),
@@ -30,7 +29,7 @@ fun HomeScreen(
             Text("NOTHING", color = NothingGray, style = MaterialTheme.typography.labelSmall)
             Text("TUBE", color = NothingWhite, style = MaterialTheme.typography.headlineLarge)
             Spacer(Modifier.height(8.dp))
-            NothingDotMatrix()
+            if (SettingsManager.showDots) NothingDotMatrix()
             Spacer(Modifier.height(24.dp))
         }
         item {
@@ -40,15 +39,15 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = NothingWhite,
+                    focusedBorderColor = accent,
                     unfocusedBorderColor = NothingDot,
                     focusedTextColor = NothingWhite,
                     unfocusedTextColor = NothingWhite,
-                    cursorColor = NothingRed
+                    cursorColor = accent
                 ),
                 trailingIcon = {
                     TextButton(onClick = { if (query.isNotBlank()) onSearch(query) }) {
-                        Text("IR", color = NothingRed)
+                        Text("IR", color = accent)
                     }
                 }
             )

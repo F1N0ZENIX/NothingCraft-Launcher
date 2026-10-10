@@ -24,7 +24,7 @@ fun SearchScreen(
     var query by remember { mutableStateOf("") }
     var results by remember { mutableStateOf<List<VideoItem>>(emptyList()) }
     var loading by remember { mutableStateOf(false) }
-    var message by remember { mutableStateOf<String?>(null) }
+    var errorMsg by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
 
     Column(Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
@@ -36,13 +36,16 @@ fun SearchScreen(
             onSearch = {
                 if (query.isBlank()) return@NothingSearchBar
                 if (apiKey.isBlank()) {
-                    message = "Configure sua chave da YouTube Data API nas Configurações."
+                    errorMsg = "Chave não configurada. Vá em Ajustes → cole a chave → Salvar."
                 } else {
-                    loading = true; message = null
+                    loading = true; errorMsg = null; results = emptyList()
                     scope.launch {
-                        try { results = onSearch(query, musicMode) }
-                        catch (e: Exception) { message = "Erro: ${e.message}" }
-                        finally { loading = false }
+                        try {
+                            results = onSearch(query, musicMode)
+                            if (results.isEmpty()) errorMsg = "Nenhum resultado. Tente outra palavra."
+                        } catch (e: Exception) {
+                            errorMsg = e.message ?: "Erro desconhecido."
+                        } finally { loading = false }
                     }
                 }
             }
@@ -54,14 +57,21 @@ fun SearchScreen(
                 Column(Modifier.padding(16.dp)) {
                     Text("Chave de API necessária", color = NothingWhite, style = MaterialTheme.typography.titleLarge)
                     Spacer(Modifier.height(8.dp))
-                    Text("Para buscar vídeos, configure uma chave da YouTube Data API v3 nas Configurações.", color = NothingGray)
+                    Text("1. Abra console.cloud.google.com", color = NothingGray, style = MaterialTheme.typography.bodyMedium)
+                    Text("2. Ative a YouTube Data API v3", color = NothingGray, style = MaterialTheme.typography.bodyMedium)
+                    Text("3. Crie uma chave de API", color = NothingGray, style = MaterialTheme.typography.bodyMedium)
+                    Text("4. Cole em Ajustes → Salvar chave", color = NothingGray, style = MaterialTheme.typography.bodyMedium)
                 }
             }
         }
 
-        message?.let {
+        errorMsg?.let {
             Spacer(Modifier.height(8.dp))
-            Text(it, color = NothingRed, style = MaterialTheme.typography.bodyMedium)
+            Surface(color = NothingDarkGray, shape = MaterialTheme.shapes.medium) {
+                Text(it, color = accentColorFor(com.nothingtube.settings.SettingsManager.accentColor),
+                    modifier = Modifier.padding(12.dp),
+                    style = MaterialTheme.typography.bodyMedium)
+            }
         }
 
         if (loading) {
@@ -74,6 +84,7 @@ fun SearchScreen(
             items(results) { item ->
                 NothingVideoCard(item = item, onClick = { onOpenVideo(item) })
             }
+            item { Spacer(Modifier.height(24.dp)) }
         }
     }
 }

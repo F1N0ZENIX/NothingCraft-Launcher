@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
+import com.nothingtube.settings.SettingsManager
 import com.nothingtube.ui.theme.*
 
 @Composable
@@ -25,6 +26,7 @@ fun NothingSearchBar(
     onSearch: () -> Unit,
     placeholder: String = "Pesquisar vídeos..."
 ) {
+    val accent = accentColorFor(SettingsManager.accentColor)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -44,7 +46,7 @@ fun NothingSearchBar(
             BasicTextField(
                 value = value, onValueChange = onValueChange,
                 singleLine = true, textStyle = LocalTextStyle.current.copy(color = NothingWhite),
-                cursorBrush = SolidColor(NothingRed),
+                cursorBrush = SolidColor(accent),
                 modifier = Modifier.fillMaxWidth()
             )
         }

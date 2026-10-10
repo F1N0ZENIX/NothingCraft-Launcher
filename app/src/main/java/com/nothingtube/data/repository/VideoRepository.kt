@@ -11,48 +11,20 @@ class VideoRepository(private val dao: VideoDao) {
     fun history(): Flow<List<VideoEntity>> = dao.getHistory()
 
     suspend fun saveVideo(item: VideoItem, favorite: Boolean = false) {
-        dao.upsert(
-            VideoEntity(
-                videoId = item.videoId,
-                title = item.title,
-                channel = item.channel,
-                thumbnail = item.thumbnail,
-                duration = item.duration,
-                isFavorite = favorite
-            )
-        )
+        dao.upsert(VideoEntity(item.videoId, item.title, item.channel, item.thumbnail, item.duration, favorite))
     }
 
     suspend fun toggleFavorite(item: VideoItem, fav: Boolean) {
-        dao.upsert(
-            VideoEntity(
-                videoId = item.videoId,
-                title = item.title,
-                channel = item.channel,
-                thumbnail = item.thumbnail,
-                duration = item.duration,
-                isFavorite = fav
-            )
-        )
+        dao.upsert(VideoEntity(item.videoId, item.title, item.channel, item.thumbnail, item.duration, fav))
     }
 
     suspend fun markOpened(item: VideoItem) {
-        dao.upsert(
-            VideoEntity(
-                videoId = item.videoId,
-                title = item.title,
-                channel = item.channel,
-                thumbnail = item.thumbnail,
-                duration = item.duration,
-                lastOpened = System.currentTimeMillis()
-            )
-        )
+        dao.upsert(VideoEntity(item.videoId, item.title, item.channel, item.thumbnail, item.duration, false, System.currentTimeMillis()))
     }
 
     suspend fun clearHistory() = dao.clearHistory()
 
     suspend fun search(query: String, apiKey: String, musicOnly: Boolean = false): List<VideoItem> {
-        if (apiKey.isBlank()) return emptyList()
         return YouTubeApiClient(apiKey).search(query, musicOnly)
     }
 }

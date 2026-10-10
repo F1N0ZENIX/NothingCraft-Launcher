@@ -5,26 +5,40 @@ import com.google.gson.annotations.SerializedName
 import com.nothingtube.data.model.VideoItem
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLEncoder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+
+class YouTubeApiException(message: String) : Exception(message)
 
 class YouTubeApiClient(private val apiKey: String) {
     private val gson = Gson()
 
     suspend fun search(query: String, musicOnly: Boolean = false): List<VideoItem> =
         withContext(Dispatchers.IO) {
+            if (apiKey.isBlank()) throw YouTubeApiException("Chave de API não configurada. Vá em Ajustes.")
             val q = if (musicOnly) "$query music" else query
             val url = URL(
                 "https://www.googleapis.com/youtube/v3/search" +
-                    "?part=snippet&type=video&maxResults=25&q=${java.net.URLEncoder.encode(q, "UTF-8")}" +
+                    "?part=snippet&type=video&maxResults=25&q=${URLEncoder.encode(q, "UTF-8")}" +
                     "&key=$apiKey"
             )
             val conn = url.openConnection() as HttpURLConnection
             conn.requestMethod = "GET"
-            conn.connectTimeout = 10_000
-            conn.readTimeout = 10_000
+            conn.connectTimeout = 15_000
+            conn.readTimeout = 15_000
             try {
-                if (conn.responseCode != 200) return@withContext emptyList()
+                val code = conn.responseCode
+                if (code != 200) {
+                    val err = conn.errorStream?.bufferedReader()?.readText() ?: ""
+                    val msg = when {
+                        code == 400 -> "Chave de API inválida. Verifique em Ajustes."
+                        code == 403 && err.contains("quotaExceeded", true) -> "Cota diária excedida. Tente amanhã."
+                        code == 403 -> "Acesso negado. Ative a YouTube Data API v3 no Google Cloud."
+                        else -> "Erro HTTP $code: ${err.take(120)}"
+                    }
+                    throw YouTubeApiException(msg)
+                }
                 val body = conn.inputStream.bufferedReader().readText()
                 val resp = gson.fromJson(body, SearchResponse::class.java)
                 val ids = resp.items.mapNotNull { it.id?.videoId }
@@ -41,7 +55,7 @@ class YouTubeApiClient(private val apiKey: String) {
             )
             val conn = url.openConnection() as HttpURLConnection
             try {
-                if (conn.responseCode != 200) return@withContext emptyList()
+                if (conn.responseCode != 200) throw YouTubeApiException("Falha ao buscar detalhes (HTTP ${conn.responseCode}).")
                 val body = conn.inputStream.bufferedReader().readText()
                 val resp = gson.fromJson(body, VideoListResponse::class.java)
                 resp.items.map { v ->
