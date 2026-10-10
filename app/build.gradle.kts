@@ -59,4 +59,7 @@ dependencies {
 
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("com.google.code.gson:gson:2.11.0")
+
+    // ✅ Coil para carregar miniaturas do YouTube
+    implementation("io.coil-kt:coil-compose:2.7.0")
 }
