@@ -21,7 +21,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
         with:
-          gradle-version: '9.7.1'
+          gradle-version: '8.9'
 
       - name: Grant execute permission
         run: chmod +x gradlew 2>/dev/null || true

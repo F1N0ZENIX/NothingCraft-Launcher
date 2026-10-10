@@ -12,6 +12,7 @@ import com.nothingtube.data.model.VideoItem
 import com.nothingtube.ui.components.NothingSearchBar
 import com.nothingtube.ui.components.NothingVideoCard
 import com.nothingtube.ui.theme.*
+import kotlinx.coroutines.launch
 
 @Composable
 fun SearchScreen(

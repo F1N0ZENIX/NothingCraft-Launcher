@@ -16,8 +16,6 @@ import com.nothingtube.ui.music.MusicScreen
 import com.nothingtube.ui.player.PlayerScreen
 import com.nothingtube.ui.search.SearchScreen
 import com.nothingtube.ui.settings.SettingsScreen
-import com.nothingtube.ui.theme.*
-import kotlinx.coroutines.flow.collectAsState
 import kotlinx.coroutines.launch
 
 @Composable
@@ -33,7 +31,6 @@ fun AppNavigation() {
     var history by remember { mutableStateOf<List<com.nothingtube.data.local.VideoEntity>>(emptyList()) }
     var currentVideo by remember { mutableStateOf<VideoItem?>(null) }
 
-    // Carrega chave do DataStore (simplificado: usa SharedPreferences por brevidade)
     LaunchedEffect(Unit) {
         val prefs = context.getSharedPreferences("nothing_tube", 0)
         apiKey = prefs.getString("api_key", "") ?: ""
