@@ -221,7 +221,7 @@ launcher_path = root / "ZalithLauncher/src/main/java/com/movtery/zalithlauncher/
 launcher = launcher_path.read_text(encoding="utf-8")
 old = '        val customArgs = version.getJvmArgs().takeIf { it.isNotBlank() } ?: AllSettings.jvmArgs.getValue()'
 new = '''        val baseCustomArgs = version.getJvmArgs().takeIf { it.isNotBlank() } ?: AllSettings.jvmArgs.getValue()
-        val withoutFsrOverride = baseCustomArgs.replace(Regex(r"""(?:^|\s)-Dnothingcraft\.fsr=\S+"""), " ").trim()
+        val withoutFsrOverride = baseCustomArgs.replace(Regex("""(?:^|\s)-Dnothingcraft\.fsr=\S+"""), " ").trim()
         val customArgs = (withoutFsrOverride + " -Dnothingcraft.fsr=" +
             if (AllSettings.fsrEnabled.getValue()) "quality" else "off").trim()'''
 if launcher.count(old) != 1:
