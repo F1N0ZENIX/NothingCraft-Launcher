@@ -1,1 +1,0 @@
-# Nothing Tube – regras padrão
