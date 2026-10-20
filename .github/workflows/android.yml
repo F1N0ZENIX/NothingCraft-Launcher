@@ -17,9 +17,18 @@ jobs:
           distribution: temurin
           java-version: '17'
           cache: gradle
-      - uses: android-actions/setup-android@v3
+      # Avoid setup-android's legacy attempt to install the removed "tools" package.
       - name: Install Android SDK platform
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+        shell: bash
+        run: |
+          SDK_ROOT="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          SDKMANAGER="$(find "$SDK_ROOT/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          if [ -z "$SDKMANAGER" ]; then
+            echo "sdkmanager was not found under $SDK_ROOT/cmdline-tools"
+            exit 1
+          fi
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
