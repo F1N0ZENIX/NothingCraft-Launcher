@@ -39,13 +39,28 @@ jobs:
       - name: Build release APK
         if: startsWith(github.ref, 'refs/tags/v')
         run: ./gradlew --no-daemon assembleRelease
-      - name: Rename release APK
-        if: startsWith(github.ref, 'refs/tags/v')
-        run: cp app/build/outputs/apk/release/app-release-unsigned.apk "NothingCraft-Launcher-${GITHUB_REF_NAME}.apk"
+      - name: Prepare signing key
+        if: startsWith(github.ref, 'refs/tags/v') && secrets.ANDROID_KEYSTORE_BASE64 != ''
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/nothingcraft-release.jks"
+      - name: Sign release APK
+        if: startsWith(github.ref, 'refs/tags/v') && secrets.ANDROID_KEYSTORE_BASE64 != ''
+        env:
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" sign --ks "$RUNNER_TEMP/nothingcraft-release.jks" --ks-pass "pass:$STORE_PASSWORD" --ks-key-alias "$KEY_ALIAS" --key-pass "pass:$KEY_PASSWORD" --out "NothingCraft-Launcher-${GITHUB_REF_NAME}.apk" app/build/outputs/apk/release/app-release-unsigned.apk
+      - name: Create installable debug-signed fallback
+        if: startsWith(github.ref, 'refs/tags/v') && secrets.ANDROID_KEYSTORE_BASE64 == ''
+        run: cp app/build/outputs/apk/debug/app-debug.apk "NothingCraft-Launcher-${GITHUB_REF_NAME}-debug-signed.apk"
       - name: Publish GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           name: "NothingCraft Launcher ${{ github.ref_name }}"
           generate_release_notes: true
-          files: NothingCraft-Launcher-${{ github.ref_name }}.apk
+          files: |
+            NothingCraft-Launcher-${{ github.ref_name }}.apk
+            NothingCraft-Launcher-${{ github.ref_name }}-debug-signed.apk
