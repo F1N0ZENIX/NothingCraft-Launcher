@@ -113,15 +113,65 @@ if count < 60:
     raise SystemExit(f"Expected many palette entries, patched only {count}; refusing partial theme patch")
 color_path.write_text(colors, encoding="utf-8")
 
-# Put the Nothing-style dot signature in the visible legal banner on the main screen.
+# Add a visible legal notice and the Nothing-style dot signature to the main screen.
 activity_path = root / "ZalithLauncher/src/main/java/com/movtery/zalithlauncher/ui/activities/MainActivity.kt"
 activity = activity_path.read_text(encoding="utf-8")
-activity = activity.replace(
-    'text = "NOTHINGCRAFT • UNOFFICIAL MODIFIED VERSION"',
-    'text = "● ○ ●  NOTHINGCRAFT • UNOFFICIAL MODIFIED VERSION"'
-)
-if 'text = "● ○ ●  NOTHINGCRAFT • UNOFFICIAL MODIFIED VERSION"' not in activity:
-    raise SystemExit("Could not patch the NothingCraft startup banner")
+imports = [
+    "import androidx.compose.foundation.background",
+    "import androidx.compose.foundation.layout.Box",
+    "import androidx.compose.foundation.layout.padding",
+    "import androidx.compose.foundation.shape.RoundedCornerShape",
+    "import androidx.compose.material3.Text",
+    "import androidx.compose.ui.Alignment",
+    "import androidx.compose.ui.graphics.Color",
+    "import androidx.compose.ui.unit.dp",
+    "import androidx.compose.ui.unit.sp",
+]
+package_line = "package com.movtery.zalithlauncher.ui.activities"
+if package_line not in activity:
+    raise SystemExit("MainActivity package declaration not found")
+missing = [item for item in imports if item not in activity]
+activity = activity.replace(package_line, package_line + "\n\n" + "\n".join(missing), 1)
+
+opening = """                GuideHost(
+                    guides.mainScreen,
+                    nextTip = { NextTipLabel(it) }
+                ) {
+                    Background("""
+replacement = """                GuideHost(
+                    guides.mainScreen,
+                    nextTip = { NextTipLabel(it) }
+                ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                    Background("""
+if activity.count(opening) != 1:
+    raise SystemExit("Main screen container anchor not found exactly once")
+activity = activity.replace(opening, replacement, 1)
+
+closing = """                    }
+                }
+
+                //显示赞助支持的小弹窗"""
+replacement_closing = """                    }
+
+                    Text(
+                        text = "● ○ ●  NOTHINGCRAFT • UNOFFICIAL MODIFIED VERSION",
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .padding(top = 10.dp)
+                            .background(Color.Black.copy(alpha = 0.86f), RoundedCornerShape(50))
+                            .padding(horizontal = 12.dp, vertical = 6.dp),
+                        color = Color.White,
+                        fontSize = 9.sp,
+                        maxLines = 1
+                    )
+                    }
+                }
+
+                //显示赞助支持的小弹窗"""
+if activity.count(closing) != 1:
+    raise SystemExit("Main screen closing anchor not found exactly once")
+activity = activity.replace(closing, replacement_closing, 1)
 activity_path.write_text(activity, encoding="utf-8")
 
 print("Patched NothingCraft 1.0.3: AMOLED monochrome theme, Nothing-style dots, arm64 launcher.")
