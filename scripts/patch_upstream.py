@@ -228,4 +228,75 @@ if launcher.count(old) != 1:
     raise SystemExit("GameLauncher JVM args anchor not found exactly once")
 launcher_path.write_text(launcher.replace(old, new, 1), encoding="utf-8")
 
-print("Patched NothingCraft 1.0.5: AMOLED theme, icon, FSR launcher toggle.")
+# Improve default virtual controls and migrate the untouched stock layout once.
+layout_path = root / "ZalithLauncher/src/main/assets/default_layout.json"
+layout = json.loads(layout_path.read_text(encoding="utf-8"))
+layout["info"]["versionCode"] = 1
+for style in layout.get("styles", []):
+    for key in ("lightStyle", "darkStyle"):
+        cfg = style.get(key, {})
+        cfg.update({
+            "alpha": 1.0, "pressedAlpha": 1.0,
+            "backgroundColor": 3221225472, "pressedBackgroundColor": 3657433087,
+            "contentColor": 4294967295, "pressedContentColor": 4278190080,
+            "borderWidth": 1, "pressedBorderWidth": 1,
+            "borderColor": 2164260863, "pressedBorderColor": 4294967295
+        })
+layout_path.write_text(json.dumps(layout, ensure_ascii=False, indent=4) + "\\n", encoding="utf-8")
+
+control_path = root / "ZalithLauncher/src/main/java/com/movtery/zalithlauncher/game/control/ControlManager.kt"
+control = control_path.read_text(encoding="utf-8")
+if "import org.json.JSONObject" not in control:
+    control = control.replace("import org.apache.commons.io.FileUtils", "import org.apache.commons.io.FileUtils\\nimport org.json.JSONObject", 1)
+anchor = """                var isSupport = true
+                val layout: ControlLayout = try {
+                    loadLayoutFromFile(file)"""
+insert = """                normalizeNothingCraftDefaultLayout(file)
+                var isSupport = true
+                val layout: ControlLayout = try {
+                    loadLayoutFromFile(file)"""
+if control.count(anchor) != 1:
+    raise SystemExit("ControlManager layout load anchor not found exactly once")
+control = control.replace(anchor, insert, 1)
+helper = """
+    private fun normalizeNothingCraftDefaultLayout(file: File) {
+        try {
+            val root = JSONObject(file.readText())
+            val info = root.optJSONObject("info") ?: return
+            val name = info.optJSONObject("name")?.optString("default") ?: return
+            if (name != "default" || info.optInt("versionCode", 0) >= 1) return
+            val styles = root.optJSONArray("styles") ?: return
+            for (i in 0 until styles.length()) {
+                val style = styles.optJSONObject(i) ?: continue
+                for (mode in arrayOf("lightStyle", "darkStyle")) {
+                    val cfg = style.optJSONObject(mode) ?: continue
+                    cfg.put("alpha", 1.0)
+                    cfg.put("pressedAlpha", 1.0)
+                    cfg.put("backgroundColor", 3221225472L)
+                    cfg.put("pressedBackgroundColor", 3657433087L)
+                    cfg.put("contentColor", 4294967295L)
+                    cfg.put("pressedContentColor", 4278190080L)
+                    cfg.put("borderWidth", 1)
+                    cfg.put("pressedBorderWidth", 1)
+                    cfg.put("borderColor", 2164260863L)
+                    cfg.put("pressedBorderColor", 4294967295L)
+                }
+            }
+            info.put("versionCode", 1)
+            file.writeText(root.toString(2))
+            Logger.info(TAG, "Updated default touch controls for NothingCraft contrast")
+        } catch (e: Exception) {
+            Logger.warning(TAG, "Could not migrate default touch-control style: $file", e)
+        }
+    }
+
+"""
+anchor = """    /**
+     * 检查并更新设置
+     */
+    private fun checkSettings()"""
+if control.count(anchor) != 1:
+    raise SystemExit("ControlManager helper insertion anchor not found exactly once")
+control_path.write_text(control.replace(anchor, helper + anchor, 1), encoding="utf-8")
+
+print("Patched NothingCraft 1.0.5: FSR launcher toggle and high-contrast touch controls.")
