@@ -64,7 +64,7 @@ jobs:
             echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/nothingcraft-release.jks"
             "$ANDROID_HOME/build-tools/35.0.0/apksigner" sign --ks "$RUNNER_TEMP/nothingcraft-release.jks" --ks-pass "pass:$STORE_PASSWORD" --ks-key-alias "$KEY_ALIAS" --key-pass "pass:$KEY_PASSWORD" --out "NothingCraft Launcher $VERSION_NAME.apk" app/build/outputs/apk/release/app-release-unsigned.apk
           else
-            "$ANDROID_HOME/build-tools/35.0.0/apksigner" sign --ks "$HOME/.android/debug.keystore" --ks-pass pass:android --ks-key-alias androiddebugkey --key-pass pass:android --out "NothingCraft Launcher $VERSION_NAME.apk" app/build/outputs/apk/release/app-release-unsigned.apk
+            cp app/build/outputs/apk/debug/app-debug.apk "NothingCraft Launcher $VERSION_NAME.apk"
           fi
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify "NothingCraft Launcher $VERSION_NAME.apk"
 
