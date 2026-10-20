@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Apply reproducible NothingCraft branding/theme patches to pinned ZalithLauncher2 source."""
+"""Apply reproducible NothingCraft launcher branding, icon and AMOLED theme patches."""
 from pathlib import Path
 import re
 import sys
@@ -10,51 +10,42 @@ if len(sys.argv) != 2:
 root = Path(sys.argv[1])
 props_path = root / "ZalithLauncher/gradle.properties"
 props = props_path.read_text(encoding="utf-8")
-
 values = {
     "launcher_name": "NothingCraft",
     "launcher_app_name": "NothingCraft Launcher",
     "launcher_short_name": "NC",
     "url_home": "https://github.com/F1N0ZENIX/NothingCraft-Launcher",
-    "launcher_version_code": "200048",
-    "launcher_version_name": "1.0.3",
+    "launcher_version_code": "200049",
+    "launcher_version_name": "1.0.4",
 }
 for key, value in values.items():
     pattern = rf"(?m)^{re.escape(key)}=.*$"
     line = f"{key}={value}"
-    if re.search(pattern, props):
-        props = re.sub(pattern, lambda _: line, props)
-    else:
-        props += f"\n{line}"
+    props = re.sub(pattern, lambda _: line, props) if re.search(pattern, props) else props + f"\n{line}"
 props_path.write_text(props, encoding="utf-8")
 
 gradle_path = root / "ZalithLauncher/build.gradle.kts"
 gradle = gradle_path.read_text(encoding="utf-8")
-old_app_id = "applicationId = zalithPackageName"
-if gradle.count(old_app_id) != 1:
-    raise SystemExit("Expected exactly one upstream applicationId declaration; refusing unsafe patch")
-gradle = gradle.replace(old_app_id, 'applicationId = "com.f1nozenix.nothingcraft"', 1)
-old_suffix = '        applicationIdSuffix = ".v2"'
-if gradle.count(old_suffix) != 1:
-    raise SystemExit("Expected upstream .v2 application suffix; refusing unsafe patch")
-gradle = gradle.replace(old_suffix, "", 1)
-old_signing = '            signingConfig = signingConfigs.getByName("releaseBuild")'
-if gradle.count(old_signing) != 1:
-    raise SystemExit("Expected exactly one release signing config; refusing unsafe patch")
-gradle = gradle.replace(old_signing, '            signingConfig = signingConfigs.getByName("debugBuild")', 1)
+for old, new, label in [
+    ("applicationId = zalithPackageName", 'applicationId = "com.f1nozenix.nothingcraft"', "applicationId"),
+    ('        applicationIdSuffix = ".v2"', "", "applicationId suffix"),
+    ('            signingConfig = signingConfigs.getByName("releaseBuild")',
+     '            signingConfig = signingConfigs.getByName("debugBuild")', "release signing"),
+]:
+    if gradle.count(old) != 1:
+        raise SystemExit(f"Expected exactly one upstream {label} anchor; refusing unsafe patch")
+    gradle = gradle.replace(old, new, 1)
 gradle_path.write_text(gradle, encoding="utf-8")
 
-# Default to a strict black/white AMOLED palette on fresh installs.
+# A strict AMOLED-black palette with readable foregrounds for white buttons.
 settings_path = root / "ZalithLauncher/src/main/java/com/movtery/zalithlauncher/setting/AllSettings.kt"
 settings = settings_path.read_text(encoding="utf-8")
 old_default = """        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) ColorThemeType.DYNAMIC
         else ColorThemeType.EMBERMIRE"""
 if settings.count(old_default) != 1:
     raise SystemExit("Default color theme anchor not found exactly once")
-settings = settings.replace(old_default, "        ColorThemeType.URBAN_ASH", 1)
-settings_path.write_text(settings, encoding="utf-8")
+settings_path.write_text(settings.replace(old_default, "        ColorThemeType.URBAN_ASH", 1), encoding="utf-8")
 
-# Replace only the Urban Ash (sixth) swatch in each ColorTheme entry; other palettes remain intact.
 color_path = root / "ZalithLauncher/src/main/java/com/movtery/zalithlauncher/ui/theme/Color.kt"
 colors = color_path.read_text(encoding="utf-8")
 
@@ -64,30 +55,33 @@ def urban_ash_color(name):
     base = name[:-len(mode)]
     if base == "scrim":
         return "Color(0xFF000000)"
-    if base.startswith("outline"):
-        return "Color(0xFF777777)" if base == "outline" else "Color(0xFF333333)"
-    if base.startswith("error"):
-        return "Color(0xFFFFB4AB)" if dark else "Color(0xFFBA1A1A)"
-    if base.startswith("onError"):
-        return "Color(0xFF690005)" if dark else "Color(0xFFFFFFFF)"
     if base == "background" or base == "surface":
         return "Color(0xFF000000)" if dark else "Color(0xFFFFFFFF)"
     if base.startswith("surfaceContainerLowest"):
-        return "Color(0xFF050505)" if dark else "Color(0xFFFFFFFF)"
+        return "Color(0xFF000000)" if dark else "Color(0xFFFFFFFF)"
     if base.startswith("surfaceContainerLow"):
-        return "Color(0xFF0A0A0A)" if dark else "Color(0xFFF7F7F7)"
+        return "Color(0xFF080808)" if dark else "Color(0xFFF7F7F7)"
     if base.startswith("surfaceContainerHigh"):
-        return "Color(0xFF1A1A1A)" if dark else "Color(0xFFE5E5E5)"
+        return "Color(0xFF171717)" if dark else "Color(0xFFE5E5E5)"
     if base.startswith("surfaceContainerHighest"):
-        return "Color(0xFF242424)" if dark else "Color(0xFFDDDDDD)"
+        return "Color(0xFF222222)" if dark else "Color(0xFFDDDDDD)"
     if base.startswith("surfaceContainer"):
-        return "Color(0xFF111111)" if dark else "Color(0xFFEEEEEE)"
+        return "Color(0xFF101010)" if dark else "Color(0xFFEEEEEE)"
     if base == "surfaceDim":
         return "Color(0xFF000000)" if dark else "Color(0xFFDDDDDD)"
     if base == "surfaceBright":
-        return "Color(0xFF242424)" if dark else "Color(0xFFFFFFFF)"
+        return "Color(0xFF222222)" if dark else "Color(0xFFFFFFFF)"
     if base == "surfaceVariant":
-        return "Color(0xFF171717)" if dark else "Color(0xFFEEEEEE)"
+        return "Color(0xFF151515)" if dark else "Color(0xFFEEEEEE)"
+    if base.startswith("outline"):
+        return "Color(0xFF777777)" if dark else "Color(0xFF666666)"
+    if base.startswith("error"):
+        return "Color(0xFFFFB4AB)" if dark else "Color(0xFFBA1A1A)"
+    if base in ("onPrimary", "onSecondary", "onTertiary"):
+        # Primary/secondary/tertiary are white in dark mode and black in light mode.
+        return "Color(0xFF000000)" if dark else "Color(0xFFFFFFFF)"
+    if base == "onError":
+        return "Color(0xFF690005)" if dark else "Color(0xFFFFFFFF)"
     if base.startswith("on"):
         return "Color(0xFFFFFFFF)" if dark else "Color(0xFF000000)"
     if base in ("primary", "secondary", "tertiary"):
@@ -105,6 +99,7 @@ def patch_color_line(match):
     parts = args.split(", ")
     if len(parts) != 7:
         raise SystemExit(f"Unexpected ColorTheme argument count in {name}: {len(parts)}")
+    # Urban Ash is the sixth palette entry in each ColorTheme constructor.
     parts[5] = urban_ash_color(name)
     return f"val {name} = ColorTheme(" + ", ".join(parts) + ")"
 
@@ -113,7 +108,32 @@ if count < 60:
     raise SystemExit(f"Expected many palette entries, patched only {count}; refusing partial theme patch")
 color_path.write_text(colors, encoding="utf-8")
 
-# Add a visible legal notice and the Nothing-style dot signature to the main screen.
+# Replace the adaptive launcher icon with a crisp Nothing-inspired dot mark.
+res = root / "ZalithLauncher/src/main/res"
+foreground = """<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M24,34 a6,6 0,1 0,12 0 a6,6 0,1 0,-12 0
+            M48,34 a6,6 0,1 0,12 0 a6,6 0,1 0,-12 0
+            M72,34 a6,6 0,1 0,12 0 a6,6 0,1 0,-12 0
+            M24,58 a6,6 0,1 0,12 0 a6,6 0,1 0,-12 0
+            M48,58 a6,6 0,1 0,12 0 a6,6 0,1 0,-12 0
+            M72,58 a6,6 0,1 0,12 0 a6,6 0,1 0,-12 0
+            M24,82 a3,3 0,1 0,6 0 a3,3 0,1 0,-6 0
+            M51,82 a3,3 0,1 0,6 0 a3,3 0,1 0,-6 0
+            M78,82 a3,3 0,1 0,6 0 a3,3 0,1 0,-6 0"/>
+</vector>
+"""
+monochrome = foreground
+(res / "drawable/ic_launcher_foreground.xml").write_text(foreground, encoding="utf-8")
+(res / "drawable/ic_launcher_monochrome.xml").write_text(monochrome, encoding="utf-8")
+(res / "values/ic_launcher_background.xml").write_text(
+    '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#FF000000</color>\n</resources>\n',
+    encoding="utf-8"
+)
+
+# Legal notice remains visible on the home screen.
 activity_path = root / "ZalithLauncher/src/main/java/com/movtery/zalithlauncher/ui/activities/MainActivity.kt"
 activity = activity_path.read_text(encoding="utf-8")
 imports = [
@@ -132,7 +152,6 @@ if package_line not in activity:
     raise SystemExit("MainActivity package declaration not found")
 missing = [item for item in imports if item not in activity]
 activity = activity.replace(package_line, package_line + "\n\n" + "\n".join(missing), 1)
-
 opening = """                GuideHost(
                     guides.mainScreen,
                     nextTip = { NextTipLabel(it) }
@@ -147,7 +166,6 @@ replacement = """                GuideHost(
 if activity.count(opening) != 1:
     raise SystemExit("Main screen container anchor not found exactly once")
 activity = activity.replace(opening, replacement, 1)
-
 closing = """                    }
                 }
 
@@ -171,7 +189,6 @@ replacement_closing = """                    }
                 //显示赞助支持的小弹窗"""
 if activity.count(closing) != 1:
     raise SystemExit("Main screen closing anchor not found exactly once")
-activity = activity.replace(closing, replacement_closing, 1)
-activity_path.write_text(activity, encoding="utf-8")
+activity_path.write_text(activity.replace(closing, replacement_closing, 1), encoding="utf-8")
 
-print("Patched NothingCraft 1.0.3: AMOLED monochrome theme, Nothing-style dots, arm64 launcher.")
+print("Patched NothingCraft 1.0.4: AMOLED black, readable button labels, new adaptive icon.")
