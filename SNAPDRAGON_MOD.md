@@ -4,7 +4,7 @@ Mod Fabric comunitário para **Minecraft Java 26.3**, focado em otimizações de
 
 ## O que contém
 
-- Base open-source Afterburner Optimized, com otimizações de renderização, memória, iluminação e lógica do jogo.
+- Base open-source Afterburner Optimized, com otimizações de renderização, memória de buffers de chunks, cópias de construção, iluminação, geração paralela de mundo e lógica do jogo.
 - Detecção de ambiente Android usada pelo upstream para começar com opções móveis conservadoras.
 - Upscaling espacial FSR 1 (EASU + RCAS) integrado ao pipeline experimental do upstream.
 - Metadados reidentificados como NothingCraft, mantendo o ID técnico interno e compatibilidade de mixins upstream.
@@ -15,7 +15,7 @@ Mod Fabric comunitário para **Minecraft Java 26.3**, focado em otimizações de
 1. Use Minecraft Java 26.3 com Fabric Loader 0.19.5+ e Java 25.
 2. Copie `NothingCraft-Snapdragon-Optimizer-1.0.1.jar` para `mods` da instância.
 3. Teste sem Sodium/Iris/outros mods de renderização primeiro.
-4. Para ativar FSR 1, alterne o modo de upscaling no painel Afterburner/Shader settings do jogo. Se o controle não estiver disponível, edite `config/afterburner-shaders.properties` e use `upscale=quality`.
+4. Para ativar o FSR, abra as configurações de renderização do NothingCraft Launcher e ligue **NothingCraft FSR 1 Upscaling**; reinicie o jogo. O launcher passa o perfil Quality ao mod pelo argumento JVM `-Dnothingcraft.fsr=quality`. O mod continua responsável pelo pipeline EASU + RCAS.
 5. Se o jogo não iniciar, defina `upscale=off` ou remova o mod e confirme que a instância base 26.3 funciona.
 
 ## Perfil inicial para Snapdragon 778G+
