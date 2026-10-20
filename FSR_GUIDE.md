@@ -5,7 +5,7 @@ Este guia é para o mod **NothingCraft Snapdragon Optimizer**, distribuído sepa
 ## Instalar
 
 1. Instale Minecraft Java **26.3**, Fabric Loader **0.19.5 ou superior** e Java **25**.
-2. Baixe `NothingCraft-Snapdragon-Optimizer-1.0.0.jar` na [release do NothingCraft](https://github.com/F1N0ZENIX/NothingCraft-Launcher/releases).
+2. Baixe `NothingCraft-Snapdragon-Optimizer-1.0.1.jar` na [release do NothingCraft](https://github.com/F1N0ZENIX/NothingCraft-Launcher/releases).
 3. Copie o JAR para a pasta `mods` da instância 26.3.
 4. Abra o jogo primeiro sem Sodium, Iris ou outros mods de renderização, para verificar que a instância inicia normalmente.
 
