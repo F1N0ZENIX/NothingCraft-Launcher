@@ -1,4 +1,4 @@
-name: Build NothingCraft Launcher
+name: Build NothingCraft Launcher and Snapdragon Mod
 
 on:
   push:
@@ -9,18 +9,18 @@ permissions:
   contents: write
 
 concurrency:
-  group: nothingcraft-release-1-0-3
+  group: nothingcraft-release-1-0-4
   cancel-in-progress: true
 
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 120
     steps:
       - name: Checkout NothingCraft build scripts
         uses: actions/checkout@v4
 
-      - name: Set up JDK 21
+      - name: Set up JDK 21 for Android launcher
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -38,14 +38,25 @@ jobs:
           yes | "$SDKMANAGER" --licenses >/dev/null || true
           "$SDKMANAGER" "platforms;android-37.0" "build-tools;36.0.0" "ndk;25.2.9519653"
 
-      - name: Build actual Minecraft Java launcher from pinned upstream
+      - name: Build NothingCraft Launcher APK
         run: bash scripts/build-nothingcraft.sh
 
-      - name: Upload APK artifact
+      - name: Set up JDK 25 for Minecraft 26.3 Fabric mod
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Build NothingCraft Snapdragon Optimizer Fabric mod
+        run: bash scripts/build-snapdragon-mod.sh
+
+      - name: Upload APK and mod artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: NothingCraft-Launcher-1.0.3-arm64
-          path: "dist/NothingCraft Launcher 1.0.3.apk"
+          name: NothingCraft-1.0.4-and-Snapdragon-Mod
+          path: |
+            dist/NothingCraft Launcher 1.0.4.apk
+            dist/NothingCraft-Snapdragon-Optimizer-1.0.0.jar
           if-no-files-found: error
           retention-days: 30
 
@@ -53,9 +64,11 @@ jobs:
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.3
-          name: NothingCraft Launcher 1.0.3
+          tag_name: v1.0.4
+          name: NothingCraft Launcher 1.0.4
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
           fail_on_unmatched_files: true
-          files: "dist/NothingCraft Launcher 1.0.3.apk"
+          files: |
+            dist/NothingCraft Launcher 1.0.4.apk
+            dist/NothingCraft-Snapdragon-Optimizer-1.0.0.jar
