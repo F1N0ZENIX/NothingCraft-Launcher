@@ -1,33 +1,57 @@
-# Guia de Minecraft Java 26.3 + FSR no NothingCraft
+# AMD FidelityFX FSR 1 + Minecraft Java 26.3
 
-## 1. Minecraft Java 26.3
+Este guia é para o mod **NothingCraft Snapdragon Optimizer**, distribuído separadamente do APK. Ele usa a implementação FSR 1 (EASU + RCAS) incluída no projeto open-source Afterburner Optimized.
 
-1. Abra o NothingCraft e entre no gerenciador de versões/downloads.
-2. Selecione a versão estável **26.3** e instale-a com os componentes recomendados pelo launcher.
-3. Use o runtime Java indicado pelo launcher para essa versão (Minecraft 26.3 exige Java 25).
-4. Teste primeiro sem mods, com uma instância nova. Se fechar na tela Mojang, o problema pode ser o renderer/SDL3 e não a lista de versões do launcher.
-5. Teste renderizadores disponíveis um por vez. A compatibilidade com 26.3 varia; faça backup dos mundos e não presuma que MobileGlues, GL4ES, Vulkan/Zink ou outros renderizadores sejam intercambiáveis.
+## Instalar
 
-A versão oficial 26.3 mudou para SDL3 e atualizou o backend gráfico. Referência: [notas oficiais de Minecraft Java 26.3](https://www.minecraft.net/en-us/article/minecraft-java-edition-26-3).
+1. Instale Minecraft Java **26.3**, Fabric Loader **0.19.5 ou superior** e Java **25**.
+2. Baixe `NothingCraft-Snapdragon-Optimizer-1.0.0.jar` na [release do NothingCraft](https://github.com/F1N0ZENIX/NothingCraft-Launcher/releases).
+3. Copie o JAR para a pasta `mods` da instância 26.3.
+4. Abra o jogo primeiro sem Sodium, Iris ou outros mods de renderização, para verificar que a instância inicia normalmente.
 
-## 2. FSR / super-resolução
+## Ativar FSR 1
 
-O caminho experimental conhecido para 26.3 é o mod [Super Resolution no Modrinth](https://modrinth.com/mod/superresolution). A página do projeto lista Minecraft 26.3, Fabric/Forge/NeoForge e FSR 1/2/3, mas também exige **OpenGL 4.3+** e extensões como `GL_ARB_direct_state_access`, `GL_ARB_gl_spirv` e `GL_ARB_clear_texture`.
+A implementação FSR 1 faz parte do caminho experimental de renderização do mod. Ela **não é geração de quadros**:
 
-1. Crie uma instância **Fabric 26.3** separada.
-2. Baixe somente a build do mod correspondente a Minecraft 26.3 e Fabric na página de versões do projeto. Não use JAR de outra versão do jogo.
-3. Instale o Fabric API correspondente caso a versão do mod exija.
-4. Coloque o JAR na pasta `mods` da instância e inicie o jogo.
-5. Se o mod indicar que o OpenGL/extensões não são suportados ou o jogo fechar, remova o mod e volte à instância sem mods.
+- **EASU** amplia a imagem renderizada em resolução interna menor.
+- **RCAS** aplica nitidez depois do upscaling.
 
-### Limitações importantes no Nothing Phone (1)
+Para ativar, abra as opções do Afterburner/Shader settings dentro do jogo e alterne o modo de upscaling para `Ultra Quality`, `Quality`, `Balanced` ou `Performance`. Se não encontrar o controle na interface, feche o jogo e crie/edite o arquivo:
 
-- O mod anuncia compatibilidade com Java 26.3, mas isso **não comprova suporte ao Android ARM64 nem ao renderer específico usado pelo launcher**.
-- FSR 2/3 e geração de quadros dependem de APIs, drivers e caminhos de renderização compatíveis; não são ativados por simplesmente instalar o launcher.
-- Não incluí o JAR no APK: ele é um componente de terceiros com builds e dependências próprias. Instale-o apenas a partir da página oficial e valide no dispositivo.
-- Se o launcher abrir o jogo mas o mundo ficar invisível, apresentar artefatos ou travar, isso aponta para incompatibilidade gráfica. Teste outro renderer ou aguarde uma versão compatível; não há configuração universal que garanta 26.3 + FSR no Android.
+`config/afterburner-shaders.properties`
 
-## Fontes
+Coloque uma destas linhas:
+- `upscale=ultra_quality` — menor redução de resolução, boa primeira tentativa.
+- `upscale=quality` — equilíbrio entre nitidez e desempenho.
+- `upscale=balanced` — renderiza mais baixo; pode ficar mais borrado.
+- `upscale=performance` — maior redução; qualidade visual menor.
+- `upscale=off` — desativa o FSR.
 
-- [Minecraft Java 26.3 — notas oficiais](https://www.minecraft.net/en-us/article/minecraft-java-edition-26-3)
-- [Super Resolution — Modrinth](https://modrinth.com/mod/superresolution)
+Se o arquivo já existir, mantenha as demais configurações e altere apenas a propriedade `upscale`.
+
+## Perfil inicial para Snapdragon 778G+ / Nothing Phone (1)
+
+Comece de forma conservadora:
+- Distância de renderização: **6–8 chunks**.
+- Distância de simulação: **4–6 chunks**.
+- Gráficos: **Rápidos**.
+- Partículas: **Reduzidas**.
+- Nuvens: **Desligadas**.
+- Limite de FPS: **45 ou 60**, escolhendo o mais estável e frio.
+- FSR: teste primeiro `ultra_quality`, depois `quality`.
+
+Compare o mesmo mundo e a mesma posição com e sem FSR. O ganho depende de a GPU estar limitada pela resolução; se o gargalo for CPU, chunk generation, memória ou o próprio renderer, a melhora pode ser pequena ou inexistente.
+
+## Compatibilidade e recuperação
+
+- O mod é destinado a Minecraft Java 26.3/Fabric, mas o suporte ao renderer específico do Android não é garantido.
+- O FSR precisa que o renderer exponha as APIs gráficas exigidas pelos shaders. O pipeline experimental pode não funcionar em alguns renderizadores móveis.
+- Sodium/Iris e outros mods de renderização podem desativar partes do pipeline do Afterburner para evitar conflitos.
+- Se aparecer tela preta, artefatos, falha de compilação de shader ou crash, defina `upscale=off` ou remova o mod e teste a instância sem mods.
+- Faça backup dos mundos e teste em uma instância separada.
+
+## Créditos
+
+- [Afterburner Optimized](https://github.com/HamdanProfessional/afterburner-optimized) — base do mod, licença MIT.
+- [AMD FidelityFX Super Resolution](https://gpuopen.com/fidelityfx-superresolution/) — algoritmo publicado que inspira a implementação FSR 1 do upstream.
+- [Notas oficiais de Minecraft Java 26.3](https://www.minecraft.net/en-us/article/minecraft-java-edition-26-3).
