@@ -68,6 +68,4 @@ jobs:
         with:
           name: "NothingCraft Launcher ${{ github.ref_name }}"
           generate_release_notes: true
-          files: |
-            NothingCraft-Launcher-${{ github.ref_name }}.apk
-            NothingCraft-Launcher-${{ github.ref_name }}-debug-signed.apk
+          files: NothingCraft-Launcher-${{ github.ref_name }}*.apk
