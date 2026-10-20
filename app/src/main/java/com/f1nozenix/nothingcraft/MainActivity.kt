@@ -92,7 +92,7 @@ class MainActivity : Activity() {
             orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL
             setPadding(dp(22), dp(14), dp(22), dp(14))
         }
-        header.addView(DotMark(), LinearLayout.LayoutParams(dp(34), dp(34)))
+        header.addView(DotMark(this), LinearLayout.LayoutParams(dp(34), dp(34)))
         val brand = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(10), 0, 0, 0) }
         brand.addView(text("NOTHINGCRAFT", 13f, fg, true))
         brand.addView(text("JAVA LAUNCHER", 9f, muted, true))
