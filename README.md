@@ -20,8 +20,8 @@ NothingCraft adapta o motor de inicialização do [ZalithLauncher2](https://gith
 | Recurso | Estado |
 |---|---|
 | Launcher Minecraft Java para Android ARM64 | Build automatizado |
-| Tema AMOLED preto e texto de alto contraste | Incluído na 1.0.4 |
-| Ícone adaptativo NothingCraft | Incluído na 1.0.4 |
+| Tema AMOLED preto e texto de alto contraste | Incluído na 1.0.5 |
+| Ícone adaptativo NothingCraft | Incluído na 1.0.5 |
 | Minecraft Java 26.3 | Depende do runtime e renderizador compatíveis |
 | Mod Fabric com FSR 1 e otimizações para celulares | Artefato separado; teste no dispositivo |
 | FSR funcionando em todo renderer Android | **Não garantido** |
@@ -51,7 +51,7 @@ O mod Fabric é construído a partir do projeto open-source [Afterburner Optimiz
 ### Instalação do mod
 
 1. Instale a versão de Minecraft Java **26.3** e o Fabric Loader exigido pelo mod.
-2. Baixe o arquivo `NothingCraft-Snapdragon-Optimizer-1.0.0.jar` da [release](https://github.com/F1N0ZENIX/NothingCraft-Launcher/releases).
+2. Baixe o arquivo `NothingCraft-Snapdragon-Optimizer-1.0.1.jar` da [release](https://github.com/F1N0ZENIX/NothingCraft-Launcher/releases).
 3. Coloque o JAR na pasta `mods` da instância 26.3.
 4. Inicie primeiro sem outros mods de renderização para testar.
 5. Abra as opções do mod e ative o upscaling FSR 1, se o renderizador permitir. Teste primeiro em um mundo descartável.
