@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: nothingcraft-release-1-0-4
+  group: nothingcraft-release-1-0-5
   cancel-in-progress: true
 
 jobs:
@@ -55,8 +55,8 @@ jobs:
         with:
           name: NothingCraft-1.0.4-and-Snapdragon-Mod
           path: |
-            dist/NothingCraft Launcher 1.0.4.apk
-            dist/NothingCraft-Snapdragon-Optimizer-1.0.0.jar
+            dist/NothingCraft Launcher 1.0.5.apk
+            dist/NothingCraft-Snapdragon-Optimizer-1.0.1.jar
           if-no-files-found: error
           retention-days: 30
 
@@ -64,11 +64,11 @@ jobs:
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.4
-          name: NothingCraft Launcher 1.0.4
+          tag_name: v1.0.5
+          name: NothingCraft Launcher 1.0.5
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
           fail_on_unmatched_files: true
           files: |
-            dist/NothingCraft Launcher 1.0.4.apk
-            dist/NothingCraft-Snapdragon-Optimizer-1.0.0.jar
+            dist/NothingCraft Launcher 1.0.5.apk
+            dist/NothingCraft-Snapdragon-Optimizer-1.0.1.jar
