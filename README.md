@@ -81,3 +81,7 @@ Projeto independente, sem afiliação à Nothing Technology Ltd. ou Mojang/Micro
 - [ ] Testar atualização assinada entre releases.
 
 **NOTHINGCRAFT · Less noise. More blocks.**
+
+## APKs e versões
+
+Os APKs gerados pelo GitHub Actions usam o nome `NothingCraft Launcher XX.XX.XX.apk`, em que `XX.XX.XX` é o valor de `versionName` em `app/build.gradle` (por exemplo, `NothingCraft Launcher 1.0.0.apk`). Builds de teste ficam nos artefatos da execução; releases versionadas ficam na página Releases.
