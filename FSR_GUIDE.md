@@ -1,6 +1,6 @@
 # AMD FidelityFX FSR 1 + Minecraft Java 26.3
 
-Este guia é para o mod **NothingCraft Snapdragon Optimizer**, distribuído separadamente do APK. Ele usa a implementação FSR 1 (EASU + RCAS) incluída no projeto open-source Afterburner Optimized.
+A opção de ativação fica no próprio launcher: **Configurações → Gráficos/Renderizador → NothingCraft FSR 1 Upscaling**. O APK passa a preferência ao jogo, e o mod **NothingCraft Snapdragon Optimizer** fornece o pipeline gráfico EASU + RCAS. O FSR não é um algoritmo Android universal: depende do renderer compatível e do mod Fabric.
 
 ## Instalar
 
@@ -16,7 +16,7 @@ A implementação FSR 1 faz parte do caminho experimental de renderização do m
 - **EASU** amplia a imagem renderizada em resolução interna menor.
 - **RCAS** aplica nitidez depois do upscaling.
 
-Para ativar, abra as opções do Afterburner/Shader settings dentro do jogo e alterne o modo de upscaling para `Ultra Quality`, `Quality`, `Balanced` ou `Performance`. Se não encontrar o controle na interface, feche o jogo e crie/edite o arquivo:
+Para ativar o perfil inicial Quality, use o interruptor no launcher e reinicie o jogo. O launcher controla o FSR do mundo principal; o suporte com shader packs é limitado e pode depender das configurações do próprio pack. Para diagnóstico avançado, o pipeline aceita os níveis `ultra_quality`, `quality`, `balanced`, `performance` e `off` por propriedade JVM `-Dnothingcraft.fsr=...`.
 
 `config/afterburner-shaders.properties`
 
