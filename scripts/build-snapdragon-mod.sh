@@ -20,7 +20,7 @@ import sys
 root = Path(sys.argv[1])
 props = root / "gradle.properties"
 s = props.read_text(encoding="utf-8")
-s, n = re.subn(r"(?m)^version=.*$", "version=1.0.0-nc1", s)
+s, n = re.subn(r"(?m)^version=.*$", "version=1.0.1-nc2", s)
 if n != 1:
     raise SystemExit("Could not set Snapdragon mod version")
 props.write_text(s, encoding="utf-8")
@@ -40,9 +40,23 @@ for path, name, description in metadata:
     data["authors"] = ["F1N0ZENIX (NothingCraft fork)", "Hamdan (Afterburner upstream)"]
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-# FSR 1 remains available in the mod's native in-game settings; don't force it on
-# before the Android renderer has been tested on the target device.
-print("Prepared NothingCraft Snapdragon Optimizer metadata; upstream mobile defaults and FSR 1 retained.")
+# The launcher controls FSR via -Dnothingcraft.fsr. The shader implementation stays
+# in the mod so EASU + RCAS run in the correct GPU render-graph location.
+world_scale = root / "src/labs/java/com/afterburner/labs/render/WorldScale.java"
+source = world_scale.read_text(encoding="utf-8")
+old_scale = "float scale = Shaderpacks.upscale().scale;"
+new_scale = """String preset = System.getProperty("nothingcraft.fsr", "off").trim().toLowerCase(java.util.Locale.ROOT);
+		float scale = switch (preset) {
+			case "ultra_quality" -> 0.77F;
+			case "quality" -> 0.67F;
+			case "balanced" -> 0.59F;
+			case "performance" -> 0.50F;
+			default -> 1.0F;
+		};"""
+if source.count(old_scale) != 1:
+    raise SystemExit("Could not locate FSR world-scale anchor")
+world_scale.write_text(source.replace(old_scale, new_scale, 1), encoding="utf-8")
+print("Prepared NothingCraft Snapdragon Optimizer with launcher-controlled FSR 1 and upstream worldgen/memory optimizations.")
 PY
 
 cd "$UPSTREAM_DIR"
@@ -55,5 +69,5 @@ if [ -z "$JAR" ]; then
   exit 1
 fi
 mkdir -p "$ROOT/dist"
-cp "$JAR" "$ROOT/dist/NothingCraft-Snapdragon-Optimizer-1.0.0.jar"
+cp "$JAR" "$ROOT/dist/NothingCraft-Snapdragon-Optimizer-1.0.1.jar"
 printf 'MOD=%s\n' "$ROOT/dist/NothingCraft-Snapdragon-Optimizer-1.0.0.jar"
