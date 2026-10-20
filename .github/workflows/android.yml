@@ -20,6 +20,10 @@ jobs:
       - uses: android-actions/setup-android@v3
       - name: Install Android SDK platform
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
       - name: Prepare Gradle wrapper if absent
         run: |
           if [ ! -f gradlew ]; then gradle wrapper --gradle-version 8.9; fi
