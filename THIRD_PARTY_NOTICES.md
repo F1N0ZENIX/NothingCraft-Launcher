@@ -1,19 +1,23 @@
 # Créditos e avisos de terceiros
 
 ## ZalithLauncher2
-
 - Projeto: https://github.com/ZalithLauncher/ZalithLauncher2
-- Autoria upstream: MovTery e contribuidores.
-- Licença: GNU GPL-3.0.
-- Commit usado para construir NothingCraft 1.0.2: `3554dff68a974bb39ad15a880a5b0a658cf367e7`.
-- Modificações desta distribuição: nome/identidade NothingCraft, identificador de pacote Android, número de versão, assinatura de teste e faixa visível "UNOFFICIAL MODIFIED VERSION". O código original mantém seus cabeçalhos de copyright.
+- Licença: GPL-3.0. Os avisos de copyright e o texto integral da licença permanecem no código-fonte do launcher.
 
 ## PojavLauncher
-
 - Projeto: https://github.com/PojavLauncherTeam/PojavLauncher
-- Licença e créditos de componentes: consulte o repositório e os avisos do ZalithLauncher2.
-- NothingCraft não é afiliado ou endossado pelo projeto.
+- Tecnologia/projeto relacionado ao ecossistema de Minecraft Java em Android. Consulte o repositório para os avisos e licenças aplicáveis às partes utilizadas.
 
-## Aviso de licença
+## Afterburner Optimized / NothingCraft Snapdragon Optimizer
+- Projeto original: https://github.com/HamdanProfessional/afterburner-optimized
+- Autor upstream: Hamdan
+- Licença: MIT. O build do mod mantém o arquivo LICENSE upstream dentro do JAR com o nome de licença correspondente.
+- NothingCraft modifica metadados e redistribui o mod como uma versão comunitária identificada separadamente; o projeto original não endossa esta versão.
 
-Esta distribuição modificada é fornecida sob GPL-3.0 na medida aplicável ao trabalho derivado. A cópia da licença está em `LICENSE`. O código-fonte upstream usado é público e fixado em `scripts/UPSTREAM_COMMIT.txt`; `scripts/patch_upstream.py` documenta as modificações automatizadas necessárias para reproduzir o APK. Os avisos e licenças das bibliotecas de terceiros permanecem nos arquivos upstream, incluindo `README_EN_US.md`.
+## AMD FidelityFX Super Resolution 1
+- O mod upstream inclui uma implementação de FSR 1 (EASU + RCAS) baseada no algoritmo publicado pela AMD.
+- Referência: https://gpuopen.com/fidelityfx-superresolution/
+- A menção a AMD/FSR não implica endosso da AMD. Verifique os termos oficiais antes de redistribuir código derivado.
+
+## Marcas
+Nothing, Nothing OS, Minecraft, Mojang e Microsoft são marcas de seus respectivos titulares. NothingCraft é um projeto comunitário não oficial e não possui endosso dessas empresas.
