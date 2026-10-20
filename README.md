@@ -1,49 +1,47 @@
 # NothingCraft Launcher
 
-**Minecraft Java no Android. Do seu jeito.**
+**Minecraft Java Edition para Android — versão comunitária não oficial.**
 
-Launcher Android em desenvolvimento, com visual AMOLED monocromático e interface inspirada em launchers Java para Android.
+O NothingCraft agora usa o motor real de inicialização do [ZalithLauncher2](https://github.com/ZalithLauncher/ZalithLauncher2), que por sua vez usa tecnologia de execução do [PojavLauncher](https://github.com/PojavLauncherTeam/PojavLauncher). A interface principal, gerenciador de versões, runtimes Java, downloads e fluxo de lançamento vêm do projeto upstream; o build aplica a identidade NothingCraft e uma faixa visível de versão modificada não oficial.
 
-[![Android CI](https://github.com/F1N0ZENIX/NothingCraft-Launcher/actions/workflows/android.yml/badge.svg)](https://github.com/F1N0ZENIX/NothingCraft-Launcher/actions/workflows/android.yml)
+> **Aviso:** versão modificada não oficial. Não é afiliada nem endossada por ZalithLauncher, PojavLauncher, Nothing Technology Ltd. ou Mojang/Microsoft.
 
-## Versão 1.0.1
+## Versão 1.0.2
 
-- Interface redesenhada com navegação inferior, cartões de perfil, páginas de perfis e ajustes.
-- Preferências locais para perfil, escala e memória de referência.
-- Pipeline para compilar e publicar automaticamente um GitHub Release em cada atualização versionada.
-- APK de release nomeado `NothingCraft Launcher 1.0.1.apk`.
+- Substitui o protótipo de interface sem runtime por uma base real de launcher Java para Android.
+- Gerencia versões do Minecraft Java e seus componentes pelo fluxo do upstream.
+- Mantém o pacote Android `com.f1nozenix.nothingcraft`.
+- Compilação otimizada para **arm64**, adequada ao Nothing Phone (1) e ao Snapdragon 778G+.
+- APK publicado automaticamente em Releases pelo GitHub Actions.
 
-## Estado real dos recursos
+## Baixar
 
-Esta versão melhora a interface e o pipeline de distribuição. **Ainda não inicia o Minecraft Java**: o runtime, autenticação, download de bibliotecas e gerenciamento real de versões precisam ser integrados. Os perfis mostrados são referências visuais, não versões instaladas. Escala e memória são preferências guardadas localmente e ainda não alteram o jogo. FSR e frame generation não estão implementados.
+Quando a compilação terminar, o APK estará em [Releases](https://github.com/F1N0ZENIX/NothingCraft-Launcher/releases) com o nome **NothingCraft Launcher 1.0.2.apk**. Se a execução falhar, confira [Actions](https://github.com/F1N0ZENIX/NothingCraft-Launcher/actions).
 
-## Alvo
+## Compatibilidade e limites
 
-- Dispositivo de referência: Nothing Phone (1), Snapdragon 778G+.
 - Android 8.0 ou superior.
-- Kotlin / Android nativo.
-- Estética AMOLED, preto e branco.
+- O artefato desta pipeline é arm64; não é destinado a dispositivos x86.
+- O Minecraft Java ainda requer arquivos de jogo legítimos e login/conta conforme as regras da Mojang/Microsoft. O launcher não inclui arquivos proprietários do Minecraft.
+- O renderer, a compatibilidade de versões, mods e desempenho variam por versão do jogo e pelo dispositivo.
+- **FSR e geração de quadros não são prometidos por esta versão**; só estarão disponíveis se o renderer/modo gráfico selecionado suportar esses recursos.
+- A primeira execução pode baixar runtimes e componentes e exigir espaço livre e conexão estável.
 
-## Releases automáticos
+## Fonte upstream e reprodutibilidade
 
-O workflow `.github/workflows/android.yml` compila o APK e cria o Release correspondente ao `versionName` de `app/build.gradle` em cada push para `main`. A versão desta entrega é `1.0.1` (`versionCode 2`).
+A compilação usa o repositório público do ZalithLauncher2 no commit exato registrado em [`scripts/UPSTREAM_COMMIT.txt`](scripts/UPSTREAM_COMMIT.txt), executa as modificações reproduzíveis em [`scripts/patch_upstream.py`](scripts/patch_upstream.py) e então compila com [`scripts/build-nothingcraft.sh`](scripts/build-nothingcraft.sh). Esses scripts são parte do código-fonte correspondente à distribuição. O projeto upstream e os patches permanecem acessíveis publicamente.
 
-O APK será publicado como `NothingCraft Launcher XX.XX.XX.apk`. Antes de cada nova atualização, aumente `versionCode` e `versionName`; cada versão deve ter uma tag exclusiva.
+- [ZalithLauncher2 — fonte upstream](https://github.com/ZalithLauncher/ZalithLauncher2)
+- [PojavLauncher — projeto de engine relacionado](https://github.com/PojavLauncherTeam/PojavLauncher)
+- [Licença GPL-3.0](LICENSE)
+- [Créditos e avisos de terceiros](THIRD_PARTY_NOTICES.md)
 
-## Instalar por cima da versão anterior
+## Assinatura e atualização
 
-O aplicativo mantém o mesmo `applicationId`: `com.f1nozenix.nothingcraft`. Para o Android permitir atualização sem desinstalar, a assinatura do APK novo também precisa ser a mesma da instalação atual. O workflow aceita uma chave privada estável nos GitHub Actions secrets (`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`). Sem esses secrets, gera um APK assinado com a chave de depuração do runner, útil para teste, mas **não há garantia de atualização direta entre execuções**. Configure uma chave privada estável antes de distribuir atualizações contínuas.
+O build comunitário usa a chave de depuração pública incluída no upstream para permitir builds reproduzíveis; **não é uma chave privada de distribuição segura**. O pacote e o nome de versão são estáveis, mas quem distribuir versões públicas deve configurar uma chave própria privada e mantê-la fora do repositório. Se o Android rejeitar uma atualização de uma instalação anterior do protótipo, desinstale a versão antiga uma vez e instale o APK 1.0.2. Isso pode apagar os dados locais do protótipo.
 
 ## Créditos
 
-A organização visual desta interface foi inspirada no [ZalithLauncher2](https://github.com/ZalithLauncher/ZalithLauncher2), projeto de launcher Minecraft Java para Android publicado sob a licença GPL-3.0. Esta versão usa uma implementação de interface própria e não copia os arquivos-fonte do ZalithLauncher2; não é uma fork direta do seu código. Créditos aos desenvolvedores e contribuidores do ZalithLauncher2 pela referência de design. NothingCraft não é afiliado à ZalithLauncher, Nothing Technology Ltd. ou Mojang/Microsoft.
+Código principal e runtime de launcher: **MovTery e contribuidores do ZalithLauncher2**, sob GPL-3.0. O ZalithLauncher2 usa tecnologia de execução derivada/relacionada ao PojavLauncher e inclui bibliotecas de terceiros listadas no README upstream. Os avisos de copyright e as licenças upstream devem ser mantidos em cópias modificadas.
 
-## Privacidade
-
-As preferências ficam localmente no aparelho. Não há sincronização de conta nem telemetria própria implementada.
-
-## Desenvolvimento local
-
-Requer JDK 17 e Android SDK 35. Execute `gradle assembleDebug` ou `./gradlew assembleDebug` caso o wrapper esteja presente.
-
-**NOTHINGCRAFT · Less noise. More blocks.**
+NothingCraft é uma versão comunitária modificada, com nome distinto, e não é um fork oficial nem possui endosso dos projetos mencionados.
