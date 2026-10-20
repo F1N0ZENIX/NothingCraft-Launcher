@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: nothingcraft-release-1-0-2
+  group: nothingcraft-release-1-0-3
   cancel-in-progress: false
 
 jobs:
@@ -44,8 +44,8 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: NothingCraft-Launcher-1.0.2-arm64
-          path: "dist/NothingCraft Launcher 1.0.2.apk"
+          name: NothingCraft-Launcher-1.0.3-arm64
+          path: "dist/NothingCraft Launcher 1.0.3.apk"
           if-no-files-found: error
           retention-days: 30
 
@@ -53,9 +53,9 @@ jobs:
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.2
-          name: NothingCraft Launcher 1.0.2
+          tag_name: v1.0.3
+          name: NothingCraft Launcher 1.0.3
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
           fail_on_unmatched_files: true
-          files: "dist/NothingCraft Launcher 1.0.2.apk"
+          files: "dist/NothingCraft Launcher 1.0.3.apk"
