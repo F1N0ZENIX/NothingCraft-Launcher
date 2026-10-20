@@ -13,7 +13,7 @@ Mod Fabric comunitário para **Minecraft Java 26.3**, focado em otimizações de
 ## Instalação
 
 1. Use Minecraft Java 26.3 com Fabric Loader 0.19.5+ e Java 25.
-2. Copie `NothingCraft-Snapdragon-Optimizer-1.0.0.jar` para `mods` da instância.
+2. Copie `NothingCraft-Snapdragon-Optimizer-1.0.1.jar` para `mods` da instância.
 3. Teste sem Sodium/Iris/outros mods de renderização primeiro.
 4. Para ativar FSR 1, alterne o modo de upscaling no painel Afterburner/Shader settings do jogo. Se o controle não estiver disponível, edite `config/afterburner-shaders.properties` e use `upscale=quality`.
 5. Se o jogo não iniciar, defina `upscale=off` ou remova o mod e confirme que a instância base 26.3 funciona.
