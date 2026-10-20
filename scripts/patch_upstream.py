@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Apply reproducible NothingCraft launcher branding, icon and AMOLED theme patches."""
 from pathlib import Path
+import json
 import re
 import sys
 
