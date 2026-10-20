@@ -242,12 +242,12 @@ for style in layout.get("styles", []):
             "borderWidth": 1, "pressedBorderWidth": 1,
             "borderColor": 2164260863, "pressedBorderColor": 4294967295
         })
-layout_path.write_text(json.dumps(layout, ensure_ascii=False, indent=4) + "\\n", encoding="utf-8")
+layout_path.write_text(json.dumps(layout, ensure_ascii=False, indent=4) + "\n", encoding="utf-8")
 
 control_path = root / "ZalithLauncher/src/main/java/com/movtery/zalithlauncher/game/control/ControlManager.kt"
 control = control_path.read_text(encoding="utf-8")
 if "import org.json.JSONObject" not in control:
-    control = control.replace("import org.apache.commons.io.FileUtils", "import org.apache.commons.io.FileUtils\\nimport org.json.JSONObject", 1)
+    control = control.replace("import org.apache.commons.io.FileUtils", "import org.apache.commons.io.FileUtils\nimport org.json.JSONObject", 1)
 anchor = """                var isSupport = true
                 val layout: ControlLayout = try {
                     loadLayoutFromFile(file)"""
