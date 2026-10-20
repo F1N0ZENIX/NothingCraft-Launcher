@@ -2,86 +2,48 @@
 
 **Minecraft Java no Android. Do seu jeito.**
 
-Uma experiência Android inspirada na estética minimalista Nothing OS: preto AMOLED, branco, matriz de pontos e foco em desempenho.
+Launcher Android em desenvolvimento, com visual AMOLED monocromático e interface inspirada em launchers Java para Android.
 
 [![Android CI](https://github.com/F1N0ZENIX/NothingCraft-Launcher/actions/workflows/android.yml/badge.svg)](https://github.com/F1N0ZENIX/NothingCraft-Launcher/actions/workflows/android.yml)
 
-## Estado da versão inicial
+## Versão 1.0.1
 
-Esta versão estabelece a base Android, identidade visual, preferências locais e pipeline de compilação. A execução real do Minecraft Java ainda depende da integração com runtime e componentes compatíveis. FSR e frame generation não estão implementados nesta versão e não devem ser anunciados como funcionais.
+- Interface redesenhada com navegação inferior, cartões de perfil, páginas de perfis e ajustes.
+- Preferências locais para perfil, escala e memória de referência.
+- Pipeline para compilar e publicar automaticamente um GitHub Release em cada atualização versionada.
+- APK de release nomeado `NothingCraft Launcher 1.0.1.apk`.
 
-## Objetivos
+## Estado real dos recursos
 
-- Interface preta AMOLED com detalhes monocromáticos pontilhados.
-- Avaliar integração com [PojavLauncher](https://github.com/PojavLauncherTeam/PojavLauncher), respeitando licenças e dependências.
-- Preparar controles de resolução e escala de renderização.
-- Desenvolver pensando no Nothing Phone (1), Snapdragon 778G+.
-- Compilar APK automaticamente com GitHub Actions e anexá-lo aos Releases por tag.
-- Preservar dados nas atualizações mantendo application ID e assinatura.
+Esta versão melhora a interface e o pipeline de distribuição. **Ainda não inicia o Minecraft Java**: o runtime, autenticação, download de bibliotecas e gerenciamento real de versões precisam ser integrados. Os perfis mostrados são referências visuais, não versões instaladas. Escala e memória são preferências guardadas localmente e ainda não alteram o jogo. FSR e frame generation não estão implementados.
 
-## Compatibilidade-alvo
+## Alvo
 
-| Item | Alvo |
-|---|---|
-| Dispositivo | Nothing Phone (1) |
-| Processador | Snapdragon 778G+ |
-| Plataforma | Android 8.0+ |
-| Linguagem | Kotlin |
-| Interface | AMOLED, branco e pontos |
-
-## Gráficos, FSR e desempenho
-
-FSR não é um recurso universal do Android: precisa ser integrado ao caminho de renderização escolhido. O resultado depende do renderer, drivers, versão do Minecraft e mods. Frame generation também exige implementação compatível e testes reais.
-
-## Instalar
-
-1. Abra [Releases](https://github.com/F1N0ZENIX/NothingCraft-Launcher/releases).
-2. Baixe o APK anexado à versão desejada.
-3. Autorize a instalação se o Android solicitar.
-4. Instale sobre a versão anterior. Não desinstale se quiser preservar dados.
-
-## Compilar localmente
-
-Requer JDK 17 e Android SDK.
-
-```bash
-git clone https://github.com/F1N0ZENIX/NothingCraft-Launcher.git
-cd NothingCraft-Launcher
-./gradlew assembleDebug
-```
+- Dispositivo de referência: Nothing Phone (1), Snapdragon 778G+.
+- Android 8.0 ou superior.
+- Kotlin / Android nativo.
+- Estética AMOLED, preto e branco.
 
 ## Releases automáticos
 
-O workflow `.github/workflows/android.yml` compila o APK em pushes e cria um GitHub Release ao receber uma tag como `v1.0.0`. O arquivo será chamado `NothingCraft-Launcher-v1.0.0.apk`.
+O workflow `.github/workflows/android.yml` compila o APK e cria o Release correspondente ao `versionName` de `app/build.gradle` em cada push para `main`. A versão desta entrega é `1.0.1` (`versionCode 2`).
 
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
+O APK será publicado como `NothingCraft Launcher XX.XX.XX.apk`. Antes de cada nova atualização, aumente `versionCode` e `versionName`; cada versão deve ter uma tag exclusiva.
 
-O Android só permite atualização direta quando application ID e assinatura são os mesmos e a versão nova tem versionCode superior. Para distribuição contínua, configure uma chave de assinatura própria nos secrets do GitHub e mantenha-a protegida. O pipeline inicial gera APK release sem assinatura própria; não publique atualizações públicas contínuas sem resolver a assinatura.
+## Instalar por cima da versão anterior
+
+O aplicativo mantém o mesmo `applicationId`: `com.f1nozenix.nothingcraft`. Para o Android permitir atualização sem desinstalar, a assinatura do APK novo também precisa ser a mesma da instalação atual. O workflow aceita uma chave privada estável nos GitHub Actions secrets (`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`). Sem esses secrets, gera um APK assinado com a chave de depuração do runner, útil para teste, mas **não há garantia de atualização direta entre execuções**. Configure uma chave privada estável antes de distribuir atualizações contínuas.
+
+## Créditos
+
+A organização visual desta interface foi inspirada no [ZalithLauncher2](https://github.com/ZalithLauncher/ZalithLauncher2), projeto de launcher Minecraft Java para Android publicado sob a licença GPL-3.0. Esta versão usa uma implementação de interface própria e não copia os arquivos-fonte do ZalithLauncher2; não é uma fork direta do seu código. Créditos aos desenvolvedores e contribuidores do ZalithLauncher2 pela referência de design. NothingCraft não é afiliado à ZalithLauncher, Nothing Technology Ltd. ou Mojang/Microsoft.
 
 ## Privacidade
 
-As preferências desta base ficam no dispositivo. Não há sincronização de conta nem telemetria própria implementada.
+As preferências ficam localmente no aparelho. Não há sincronização de conta nem telemetria própria implementada.
 
-## Licenças
+## Desenvolvimento local
 
-Projeto independente, sem afiliação à Nothing Technology Ltd. ou Mojang/Microsoft. Minecraft é marca de seus proprietários. Nenhum arquivo proprietário do jogo é distribuído. Código e dependências de terceiros devem manter suas respectivas licenças.
-
-## Roadmap
-
-- [x] Base Android e identidade visual AMOLED.
-- [x] Preferências locais iniciais.
-- [x] CI de compilação e release por tag.
-- [ ] Integrar runtime Java e autenticação compatíveis.
-- [ ] Instalação/seleção de versões e gestão de bibliotecas.
-- [ ] Validar escala de resolução no aparelho físico.
-- [ ] Investigar integração real de FSR no renderer escolhido.
-- [ ] Testar atualização assinada entre releases.
+Requer JDK 17 e Android SDK 35. Execute `gradle assembleDebug` ou `./gradlew assembleDebug` caso o wrapper esteja presente.
 
 **NOTHINGCRAFT · Less noise. More blocks.**
-
-## APKs e versões
-
-Os APKs gerados pelo GitHub Actions usam o nome `NothingCraft Launcher XX.XX.XX.apk`, em que `XX.XX.XX` é o valor de `versionName` em `app/build.gradle` (por exemplo, `NothingCraft Launcher 1.0.0.apk`). O CI usa o Gradle pré-instalado quando o wrapper não está no repositório. Builds de teste ficam nos artefatos da execução; releases versionadas ficam na página Releases.
