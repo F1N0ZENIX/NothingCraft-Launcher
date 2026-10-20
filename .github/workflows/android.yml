@@ -1,37 +1,47 @@
-name: Build Nothing Tube APK
-
+name: Android CI
 on:
   push:
     branches: [ main, master ]
+    tags: [ 'v*.*.*' ]
+  pull_request:
   workflow_dispatch:
-
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '17'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+          cache: gradle
+      - uses: android-actions/setup-android@v3
+      - name: Install Android SDK platform
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Prepare Gradle wrapper if absent
+        run: |
+          if [ ! -f gradlew ]; then gradle wrapper --gradle-version 8.9; fi
+          chmod +x gradlew
+      - name: Build debug APK
+        run: ./gradlew --no-daemon assembleDebug
+      - uses: actions/upload-artifact@v4
         with:
-          gradle-version: '8.9'
-
-      - name: Grant execute permission
-        run: chmod +x gradlew 2>/dev/null || true
-
-      - name: Build Debug APK
-        run: gradle assembleDebug --no-daemon
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: nothing-tube-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: NothingCraft-Launcher-debug
+          path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+          retention-days: 14
+      - name: Build release APK
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: ./gradlew --no-daemon assembleRelease
+      - name: Rename release APK
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: cp app/build/outputs/apk/release/app-release-unsigned.apk "NothingCraft-Launcher-${GITHUB_REF_NAME}.apk"
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "NothingCraft Launcher ${{ github.ref_name }}"
+          generate_release_notes: true
+          files: NothingCraft-Launcher-${{ github.ref_name }}.apk
