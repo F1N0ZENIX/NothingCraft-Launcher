@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: nothingcraft-release
+  group: nothingcraft-release-1-0-2
   cancel-in-progress: false
 
 jobs:
