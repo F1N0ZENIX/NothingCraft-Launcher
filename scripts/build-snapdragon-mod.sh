@@ -70,4 +70,4 @@ if [ -z "$JAR" ]; then
 fi
 mkdir -p "$ROOT/dist"
 cp "$JAR" "$ROOT/dist/NothingCraft-Snapdragon-Optimizer-1.0.1.jar"
-printf 'MOD=%s\n' "$ROOT/dist/NothingCraft-Snapdragon-Optimizer-1.0.0.jar"
+printf 'MOD=%s\n' "$ROOT/dist/NothingCraft-Snapdragon-Optimizer-1.0.1.jar"
