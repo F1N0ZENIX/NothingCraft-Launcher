@@ -24,6 +24,6 @@ if [ -z "$APK" ]; then
   exit 1
 fi
 mkdir -p "$ROOT/dist"
-cp "$APK" "$ROOT/dist/NothingCraft Launcher 1.0.2.apk"
-"$ANDROID_HOME/build-tools/36.0.0/apksigner" verify "$ROOT/dist/NothingCraft Launcher 1.0.2.apk" || true
-printf 'APK=%s\n' "$ROOT/dist/NothingCraft Launcher 1.0.2.apk"
+cp "$APK" "$ROOT/dist/NothingCraft Launcher 1.0.3.apk"
+"$ANDROID_HOME/build-tools/36.0.0/apksigner" verify "$ROOT/dist/NothingCraft Launcher 1.0.3.apk" || true
+printf 'APK=%s\n' "$ROOT/dist/NothingCraft Launcher 1.0.3.apk"
