@@ -15,8 +15,8 @@ values = {
     "launcher_app_name": "NothingCraft Launcher",
     "launcher_short_name": "NC",
     "url_home": "https://github.com/F1N0ZENIX/NothingCraft-Launcher",
-    "launcher_version_code": "200049",
-    "launcher_version_name": "1.0.4",
+    "launcher_version_code": "200050",
+    "launcher_version_name": "1.0.5",
 }
 for key, value in values.items():
     pattern = rf"(?m)^{re.escape(key)}=.*$"
@@ -191,4 +191,41 @@ if activity.count(closing) != 1:
     raise SystemExit("Main screen closing anchor not found exactly once")
 activity_path.write_text(activity.replace(closing, replacement_closing, 1), encoding="utf-8")
 
-print("Patched NothingCraft 1.0.4: AMOLED black, readable button labels, new adaptive icon.")
+# Add launcher-level FSR toggle and pass it to the game at startup.
+settings_path = root / "ZalithLauncher/src/main/java/com/movtery/zalithlauncher/setting/AllSettings.kt"
+settings = settings_path.read_text(encoding="utf-8")
+anchor = '    val resolutionRatio = intSetting("resolutionRatio", 100, 25..300)'
+if settings.count(anchor) != 1:
+    raise SystemExit("Resolution setting anchor not found exactly once")
+settings = settings.replace(anchor, anchor + '\n\n    /** NothingCraft: FSR 1 spatial upscaling in the compatible Afterburner renderer. */\n    val fsrEnabled = boolSetting("nothingCraftFsrEnabled", false)', 1)
+settings_path.write_text(settings, encoding="utf-8")
+
+renderer_path = root / "ZalithLauncher/src/main/java/com/movtery/zalithlauncher/ui/screens/content/settings/RendererSettingsScreen.kt"
+renderer = renderer_path.read_text(encoding="utf-8")
+anchor = "                        // 自定义分辨率\n                        AnimatedVisibility("
+insert = """                        SwitchSettingsCard(
+                            modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
+                            position = CardPosition.Bottom,
+                            unit = AllSettings.fsrEnabled,
+                            title = "NothingCraft FSR 1 Upscaling",
+                            summary = "Reduces 3D world render resolution and upscales it with EASU + RCAS. Requires the NothingCraft Snapdragon Optimizer mod; menus stay sharp. Restart the game after changing."
+                        )
+
+                        // 自定义分辨率
+                        AnimatedVisibility("""
+if renderer.count(anchor) != 1:
+    raise SystemExit("Renderer settings insertion anchor not found exactly once")
+renderer_path.write_text(renderer.replace(anchor, insert, 1), encoding="utf-8")
+
+launcher_path = root / "ZalithLauncher/src/main/java/com/movtery/zalithlauncher/game/launch/GameLauncher.kt"
+launcher = launcher_path.read_text(encoding="utf-8")
+old = '        val customArgs = version.getJvmArgs().takeIf { it.isNotBlank() } ?: AllSettings.jvmArgs.getValue()'
+new = '''        val baseCustomArgs = version.getJvmArgs().takeIf { it.isNotBlank() } ?: AllSettings.jvmArgs.getValue()
+        val withoutFsrOverride = baseCustomArgs.replace(Regex("""(?:^|\\s)-Dnothingcraft\\.fsr=\\S+"""), " ").trim()
+        val customArgs = (withoutFsrOverride + " -Dnothingcraft.fsr=" +
+            if (AllSettings.fsrEnabled.getValue()) "quality" else "off").trim()'''
+if launcher.count(old) != 1:
+    raise SystemExit("GameLauncher JVM args anchor not found exactly once")
+launcher_path.write_text(launcher.replace(old, new, 1), encoding="utf-8")
+
+print("Patched NothingCraft 1.0.5: AMOLED theme, icon, FSR launcher toggle.")
